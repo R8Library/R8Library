@@ -1,13 +1,2 @@
 getgenv().SCRIPT_KEY = "81c2dab2-595a-4adf-b485-e6e45060bd93"
 loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/545fb8c34d080290fde339f3582905046b77344ce81301591dae21a84c851ff7/download"))()
-local fn, err = loadstring(raw)
-if not fn then
-	error("[R8] loadstring failed: " .. tostring(err))
-end
-local UILibrary = fn()
-if type(UILibrary) ~= "table" then
-	UILibrary = (getgenv and (getgenv().R8_UILibrary or getgenv().UILibrary)) or nil
-end
-if type(UILibrary) ~= "table" or type(UILibrary.CreateWindow) ~= "function" then
-	error("[R8] library did not return UILibrary (got " .. type(UILibrary) .. ")")
-end
