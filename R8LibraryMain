@@ -9,7 +9,6 @@ local function isLib(v)
 	return type(v) == "table" and type(v.CreateWindow) == "function"
 end
 
--- drop stale non-tables (fixes "CreateWindow of string")
 pcall(function()
 	if not isLib(getgenv().UILibrary) then getgenv().UILibrary = nil end
 	if not isLib(getgenv().R8_UILibrary) then getgenv().R8_UILibrary = nil end
