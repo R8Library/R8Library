@@ -1,7 +1,51 @@
+-- Junkie is great but honestly so fucking bad at loading. holy fuck
+
 getgenv().SCRIPT_KEY = "81c2dab2-595a-4adf-b485-e6e45060bd93"
-loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/545fb8c34d080290fde339f3582905046b77344ce81301591dae21a84c851ff7/download"))()
 
-local UILibrary = getgenv().UILibrary
-local window = UILibrary:CreateWindow({})
+local JUNKIE_URL =
+	"https://api.jnkie.com/api/v1/luascripts/public/545fb8c34d080290fde339f3582905046b77344ce81301591dae21a84c851ff7/download"
 
-window:CreateSettingsTab()
+local function isLib(v)
+	return type(v) == "table" and type(v.CreateWindow) == "function"
+end
+
+-- drop stale non-tables (fixes "CreateWindow of string")
+pcall(function()
+	if not isLib(getgenv().UILibrary) then getgenv().UILibrary = nil end
+	if not isLib(getgenv().R8_UILibrary) then getgenv().R8_UILibrary = nil end
+end)
+
+local body = game:HttpGet(JUNKIE_URL)
+assert(type(body) == "string" and #body > 50, "[R8//TW0] Junkie download failed")
+
+local chunk, err = loadstring(body)
+assert(chunk, "[R8//TW0] loadstring failed: " .. tostring(err))
+
+local ok, ret = pcall(chunk)
+assert(ok, "[R8//TW0] Junkie error: " .. tostring(ret))
+
+local lib = isLib(ret) and ret
+	or isLib(getgenv().UILibrary) and getgenv().UILibrary
+	or isLib(getgenv().R8_UILibrary) and getgenv().R8_UILibrary
+	or nil
+
+if not lib then
+	local deadline = os.clock() + 20
+	while os.clock() < deadline do
+		if isLib(getgenv().UILibrary) then
+			lib = getgenv().UILibrary
+			break
+		end
+		if isLib(getgenv().R8_UILibrary) then
+			lib = getgenv().R8_UILibrary
+			break
+		end
+		task.wait(0.05)
+	end
+end
+
+assert(lib, "[R8//TW0] UILibrary never loaded — re-upload CLEAR library to Junkie")
+
+getgenv().UILibrary = lib
+getgenv().R8_UILibrary = lib
+return lib
